@@ -1,22 +1,50 @@
 <?php
+session_start();
 include "../config/config.php";
 
-if (isset($_POST['register'])) {
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../auth/login.php");
+    exit;
+}
+
+$id = $_SESSION['user_id'];
+
+// Ambil data user
+$query = mysqli_query($koneksi, "SELECT * FROM users WHERE id = $id");
+$user  = mysqli_fetch_assoc($query);
+
+// Proses update data
+if (isset($_POST['update'])) {
     $username = $_POST['username'];
+    $email    = $_POST['email'];
     $password = $_POST['password'];
-    $tb = $_POST['tb'];
-    $bb = $_POST['bb'];
+    $tb       = $_POST['tb'];
+    $bb       = $_POST['bb'];
 
-    // hash password
-    $hashed = password_hash($password, PASSWORD_DEFAULT);
+    // Kalau password tidak diubah
+    if (empty($password)) {
+        $password_update = $user['password'];
+    } else {
+        // Hash password baru
+        $password_update = password_hash($password, PASSWORD_DEFAULT);
+    }
 
-    // insert
-    $sql = "INSERT INTO users (username, password, tb, bb) VALUES ('$username', '$hashed', $tb, $bb)";
-    if (mysqli_query($koneksi, $sql)) {
-        header("Location: register_success.php?status=success");
+    // Query update
+    $update = mysqli_query($koneksi, "
+        UPDATE users SET
+            username = '$username',
+            email    = '$email',
+            password = '$password_update',
+            tb       = '$tb',
+            bb       = '$bb'
+        WHERE id = $id
+    ");
+
+    if ($update) {
+        header("Location: editprofile_succes.php");
         exit;
     } else {
-        $error = "Terjadi kesalahan: " . mysqli_error($koneksi);
+        $error = "Gagal memperbarui profil!";
     }
 }
 ?>
@@ -25,36 +53,42 @@ if (isset($_POST['register'])) {
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <title>Edit Profile</title>
     <link rel="stylesheet" href="../public/css/style.css">
 </head>
 <body>
 
 <div class="box">
-    <img src="../public/img/logo.jpg" class="logo">
-    <h2>Register</h2>
+    <h2>Edit Profile</h2>
 
-    <?php if(isset($error)) { ?>
+    <?php if (isset($error)) { ?>
         <div class="error"><?= $error ?></div>
     <?php } ?>
 
-    <?php if(isset($success)) { ?>
-        <div class="error" style="background:#ddffdd; color:#2b662e;"><?= $success ?></div>
-    <?php } ?>
-
     <form method="POST">
-        <input type="text" name="username" placeholder="Masukkan Username" required>
-    <div class="password-wrapper">
-        <input type="password" id="password" name="password" placeholder="Masukkan Password" required>
-        <span id="togglePassword" class="toggle-eye">&#128065;</span>
-    </div>
-        <input type="number" step="0.01" name="tb" placeholder="Tinggi Badan (cm)" required>
-        <input type="number" step="0.01" name="bb" placeholder="Berat Badan (kg)" required>
-        <button name="register">Daftar</button>
+
+        <label>Username</label>
+        <input type="text" name="username" value="<?= $user['username'] ?>" required>
+
+        <label>Email</label>
+        <input type="email" name="email" value="<?= $user['email'] ?>" required>
+
+        <label>Password Baru (kosongkan jika tidak ingin ganti)</label>
+        <input type="password" name="password" placeholder="Password baru">
+
+        <label>Tinggi Badan (cm)</label>
+        <input type="number" step="0.01" name="tb" value="<?= $user['tb'] ?>" required>
+
+        <label>Berat Badan (kg)</label>
+        <input type="number" step="0.01" name="bb" value="<?= $user['bb'] ?>" required>
+
+        <button type="submit" name="update">Update Profile</button>
     </form>
 
-    <p>Sudah punya akun? <a href="login.php">Login</a></p>
+    <p style="text-align:center; margin-top:10px;">
+        <a href="../dashboard/user_dashboard.php">← Kembali ke Dashboard</a>
+    </p>
 </div>
-<script src="../public/js/script.js"></script>
+
 </body>
 </html>

@@ -1,6 +1,7 @@
 <?php
 session_start();
 include "../config/config.php";
+include "../database/init.php";
 
 if (isset($_POST['login'])) {
 
@@ -22,13 +23,13 @@ if (isset($_POST['login'])) {
             $_SESSION['role']     = $user['role'];
 
 
-            if ($user['role'] === 'admin') {
-                header("Location: ../dashboard/admin_dashboard.php");
-                exit;
-            } else {
-                header("Location: ../dashboard/user_dashboard.php");
-                exit;
-            }
+        if ($user['role'] == 'admin') {
+            header("Location: ../dashboard/admin.php");
+            exit;
+        } else {
+            header("Location: ../dashboard/user.php");
+            exit;
+        }
 
         } else {
             $error = "Password salah!";

@@ -11,7 +11,6 @@ if (!isset($_GET['status']) || $_GET['status'] !== "success") {
 <head>
     <meta charset="UTF-8">
     <title>Registrasi Berhasil</title>
-    <link rel="stylesheet" href="../public/css/style.css">
 
     <style>
         .success-box {
