@@ -1,9 +1,9 @@
 <?php
 session_start();
-include "../config/config.php";
+include "../../config/config.php";
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
+    header("Location: ../../auth/login.php");
     exit;
 }
 
@@ -43,7 +43,7 @@ if (isset($_POST['update'])) {
     }
 
     if (mysqli_query($koneksi, $sql)) {
-        header("Location: editprofile_success.php");
+        header("Location: editprofile_succes.php");
         exit;
     } else {
         $error = "Gagal memperbarui profil!";
@@ -56,7 +56,6 @@ if (isset($_POST['update'])) {
 <head>
     <meta charset="UTF-8">
     <title>Profil Saya</title>
-    <link rel="stylesheet" href="../public/css/style.css">
     <style>
         .profile-box {
             background: white;

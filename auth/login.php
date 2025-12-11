@@ -24,10 +24,10 @@ if (isset($_POST['login'])) {
 
 
         if ($user['role'] == 'admin') {
-            header("Location: ../dashboard/admin.php");
+            header("Location: ../dashboard/admin/admin.php");
             exit;
         } else {
-            header("Location: ../dashboard/user.php");
+            header("Location: ../dashboard/user/user.php");
             exit;
         }
 
@@ -46,7 +46,7 @@ if (isset($_POST['login'])) {
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="../public/css/style.css">
+    <link rel="stylesheet" href="../public/css/auth.css">
 </head>
 <body>
 

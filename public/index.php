@@ -3,7 +3,7 @@ session_start();
 
 // Jika user sudah login, langsung masuk dashboard
 if (isset($_SESSION['user_id'])) {
-    header("Location: ../dashboard/index.php");
+    header("Location: ../dashboard/user/user.php");
     exit;
 }
 ?>

@@ -1,9 +1,9 @@
 <?php
 session_start();
-include "../config/config.php";
+include "../../config/config.php";
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
+    header("Location: ../../auth/login.php");
     exit;
 }
 
@@ -21,7 +21,7 @@ $user = mysqli_fetch_assoc($query);
 <body>
 
 <div class="profile-card">
-    <img src="../public/img/logo.jpg" class="logo-small">
+    <img src="../../public/img/logo.jpg" class="logo-small">
 
     <h2>Profil Saya</h2>
 

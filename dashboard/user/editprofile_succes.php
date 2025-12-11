@@ -23,7 +23,7 @@
             display: inline-block;
             margin-top: 15px;
             text-decoration: none;
-            background: #2196F3;
+            background: #7cb342;
             color: white;
             padding: 10px 20px;
             border-radius: 6px;

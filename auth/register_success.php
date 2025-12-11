@@ -11,36 +11,7 @@ if (!isset($_GET['status']) || $_GET['status'] !== "success") {
 <head>
     <meta charset="UTF-8">
     <title>Registrasi Berhasil</title>
-
-    <style>
-        .success-box {
-            width: 350px;
-            margin: 80px auto;
-            padding: 25px;
-            text-align: center;
-            border-radius: 10px;
-            background: #e8fff1;
-            border: 2px solid #2ecc71;
-            font-family: Arial;
-        }
-        .success-box h2 {
-            color: #2ecc71;
-        }
-        .success-box p {
-            margin-top: 10px;
-            font-size: 14px;
-        }
-        .success-box a {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 10px 20px;
-            text-decoration: none;
-            color: white;
-            background: #2ecc71;
-            border-radius: 5px;
-        }
-    </style>
-
+    <link rel="stylesheet" href="../public/css/success_regist.css">
 </head>
 <body>
 
