@@ -26,7 +26,7 @@ if (isset($_POST['register'])) {
 <head>
     <meta charset="UTF-8">
     <title>Register</title>
-    <link rel="stylesheet" href="../public/css/style.css">
+    <link rel="stylesheet" href="../public/css/auth.css">
 </head>
 <body>
 
