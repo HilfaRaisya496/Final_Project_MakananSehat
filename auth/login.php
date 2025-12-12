@@ -1,7 +1,6 @@
 <?php
 session_start();
-include "../config/config.php";
-include "../database/init.php";
+require_once "../config/config.php";
 
 if (isset($_POST['login'])) {
 

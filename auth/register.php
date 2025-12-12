@@ -1,5 +1,5 @@
 <?php
-include "../config/config.php";
+require_once "../config/config.php";
 
 if (isset($_POST['register'])) {
     $username = $_POST['username'];
@@ -44,6 +44,7 @@ if (isset($_POST['register'])) {
 
     <form method="POST">
         <input type="text" name="username" placeholder="Masukkan Username" required>
+        <input type="email" name="email" placeholder="Masukkan Email" required>
     <div class="password-wrapper">
         <input type="password" id="password" name="password" placeholder="Masukkan Password" required>
         <span id="togglePassword" class="toggle-eye">&#128065;</span>
