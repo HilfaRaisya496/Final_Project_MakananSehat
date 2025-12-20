@@ -40,7 +40,7 @@ Aplikasi web untuk membantu mahasiswa merencanakan menu sehat, mencatat makanan 
   - `/user` – halaman user: `user.php`, `rekomendasi.php`, `cari_makanan.php`, `food_logs_index.php`, `edit_profile.php`, `dashboard_gizi.php`, dll.
   - `/admin` – halaman admin: `users.php`, `notifications.php`, dll.
 - `cron_send_menu_reminder.php` – script cron pengingat menu harian.
-- `.env` – konfigurasi (DB, Edamam API, SMTP).
+- `.env.example` – konfigurasi (DB, Edamam API, SMTP).
 - `index.php` – tampilan awal(promosi).
 
 ## Cara Menjalankan di Lokal
