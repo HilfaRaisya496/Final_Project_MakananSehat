@@ -1,177 +1,163 @@
 <?php
-session_start();
-require_once "../../config/config.php";
+require __DIR__ . '/../../app/core/bootstrap.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/models/UserProfile.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../../auth/login.php");
-    exit;
+auth_required();
+role_user_only();
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-$id = $_SESSION['user_id'];
+$userId = $_SESSION['user_id'] ?? null;
 
-// Ambil data user
-$query = mysqli_query($koneksi, "SELECT * FROM users WHERE id=$id");
-$user  = mysqli_fetch_assoc($query);
+$pdo = db();
+$userProfileModel = new UserProfile($pdo);
+$profile = $userProfileModel->getByUserId((int)$userId);
 
-// Mode edit?
-$edit_mode = isset($_GET['edit']);
+// nilai default jika belum ada profil
+$targetCalories = $profile['target_calories'] ?? 2000;
+$diet           = $profile['diet'] ?? '';
+$intolerances   = $profile['intolerances'] ?? '';
+$successMsg     = '';
+$errorMsg       = '';
 
-// Proses update
-if (isset($_POST['update'])) {
-    $username = $_POST['username'];
-    $email    = $_POST['email'];
-    $tb       = $_POST['tb'];
-    $bb       = $_POST['bb'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $targetCalories = (int)($_POST['target_calories'] ?? 2000);
+    $diet           = trim($_POST['diet'] ?? '');
+    $intolerances   = trim($_POST['intolerances'] ?? '');
 
-    // Kalau password diisi → update password
-    if (!empty($_POST['password'])) {
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $sql = "UPDATE users SET 
-                username='$username', 
-                email='$email',
-                password='$password',
-                tb='$tb',
-                bb='$bb'
-                WHERE id=$id";
+    if ($targetCalories <= 0) {
+        $errorMsg = 'Target kalori harus lebih dari 0.';
     } else {
-        $sql = "UPDATE users SET 
-                username='$username', 
-                email='$email',
-                tb='$tb',
-                bb='$bb'
-                WHERE id=$id";
-    }
-
-    if (mysqli_query($koneksi, $sql)) {
-        header("Location: editprofile_succes.php");
-        exit;
-    } else {
-        $error = "Gagal memperbarui profil!";
+        $ok = $userProfileModel->save(
+            (int)$userId,
+            $targetCalories,
+            $diet,
+            $intolerances
+        );
+        if ($ok) {
+            $successMsg = 'Profil gizi berhasil disimpan.';
+        } else {
+            $errorMsg = 'Gagal menyimpan profil gizi.';
+        }
     }
 }
 ?>
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Profil Saya</title>
-    <style>
-        .profile-box {
-            background: white;
-            max-width: 400px;
-            margin: 80px auto;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .profile-box h2 {
-            text-align: center;
-        }
-
-        .data {
-            margin: 10px 0;
-            font-size: 15px;
-        }
-
-        .data span {
-            font-weight: bold;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            margin-top: 15px;
-            border-radius: 6px;
-            border: none;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .edit {
-            background: #7cb342;
-            color: white;
-        }
-
-        .save {
-            background: #7cb342;
-            color: white;
-        }
-
-        input {
-            width: 95%;
-            padding: 10px;
-            margin-top: 6px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .error {
-            background: #ffdada;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-left: 5px solid red;
-        }
-
-        label {
-            margin-top: 10px;
-            display: block;
-            font-weight: bold;
-        }
-
-        a {
-            text-decoration: none;
-            color: #ef6c00;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Edit Profil Gizi | TriHealth</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <style>
+    body {
+      background-color: #f5f7fa;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .page-title {
+      font-weight: 600;
+    }
+    .profile-card {
+      border-radius: 18px;
+    }
+  </style>
 </head>
 <body>
+<?php $active = 'profile'; include __DIR__ . '/_navbar.php'; ?>
 
-<div class="profile-box">
-    <h2>Profil Saya</h2>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="mb-1 page-title">Edit Profil Gizi</h3>
+      <p class="text-muted small mb-0">
+        Atur target kalori harian, jenis diet, dan bahan yang ingin dihindari untuk rekomendasi menu yang lebih tepat.
+      </p>
+    </div>
+    <a href="user.php" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i> Kembali
+    </a>
+  </div>
 
-    <?php if (isset($error)) { ?>
-        <div class="error"><?= $error ?></div>
-    <?php } ?>
+  <?php if ($successMsg): ?>
+    <div class="alert alert-success small">
+      <?= htmlspecialchars($successMsg) ?>
+    </div>
+  <?php endif; ?>
+  <?php if ($errorMsg): ?>
+    <div class="alert alert-danger small">
+      <?= htmlspecialchars($errorMsg) ?>
+    </div>
+  <?php endif; ?>
 
-    <?php if (!$edit_mode) { ?>
-        <!-- MODE LIHAT -->
-        <div class="data"><span>Username:</span> <?= $user['username'] ?></div>
-        <div class="data"><span>Email:</span> <?= $user['email'] ?></div>
-        <div class="data"><span>Tinggi Badan:</span> <?= $user['tb'] ?> cm</div>
-        <div class="data"><span>Berat Badan:</span> <?= $user['bb'] ?> kg</div>
+  <div class="card profile-card shadow-sm border-0">
+    <div class="card-body">
+      <form method="post" class="small" novalidate>
+        <div class="mb-3">
+          <label for="target_calories" class="form-label small fw-semibold">
+            Target kalori harian (kkal)
+          </label>
+          <input
+            type="number"
+            class="form-control form-control-sm"
+            id="target_calories"
+            name="target_calories"
+            min="800"
+            max="5000"
+            value="<?= htmlspecialchars((string)$targetCalories) ?>"
+            required
+          >
+          <div class="form-text">
+            Contoh: 2000 kkal per hari (sesuaikan dengan kebutuhanmu).
+          </div>
+        </div>
 
-        <a href="?edit=true">
-            <button class="btn edit">Edit Profil</button>
-        </a>
+        <div class="mb-3">
+          <label for="diet" class="form-label small fw-semibold">Diet (opsional)</label>
+          <select id="diet" name="diet" class="form-select form-select-sm">
+            <option value="" <?= $diet === '' ? 'selected' : '' ?>>Tidak ada / umum</option>
+            <option value="balanced" <?= $diet === 'balanced' ? 'selected' : '' ?>>Balanced</option>
+            <option value="high-protein" <?= $diet === 'high-protein' ? 'selected' : '' ?>>High protein</option>
+            <option value="low-carb" <?= $diet === 'low-carb' ? 'selected' : '' ?>>Low carb</option>
+            <option value="low-fat" <?= $diet === 'low-fat' ? 'selected' : '' ?>>Low fat</option>
+          </select>
+          <div class="form-text">
+            Dipakai sebagai filter diet saat mengambil menu dari Edamam (balanced, high-protein, low-carb, dll.).
+          </div>
+        </div>
 
-    <?php } else { ?>
-        <!-- MODE EDIT -->
-        <form method="POST">
-            <label>Username</label>
-            <input type="text" name="username" value="<?= $user['username'] ?>" required>
+        <div class="mb-3">
+          <label for="intolerances" class="form-label small fw-semibold">
+            Bahan yang ingin dihindari
+          </label>
+          <textarea
+            id="intolerances"
+            name="intolerances"
+            class="form-control form-control-sm"
+            rows="3"
+            placeholder="Contoh: peanuts, milk, shrimp"
+          ><?= htmlspecialchars($intolerances) ?></textarea>
+          <div class="form-text">
+            Pisahkan dengan koma. 
+          </div>
+        </div>
 
-            <label>Email</label>
-            <input type="email" name="email" value="<?= $user['email'] ?>" required>
-
-            <label>Password Baru (opsional)</label>
-            <input type="password" name="password" placeholder="Kosongkan jika tidak ingin mengubah">
-
-            <label>Tinggi Badan (cm)</label>
-            <input type="number" step="0.01" name="tb" value="<?= $user['tb'] ?>" required>
-
-            <label>Berat Badan (kg)</label>
-            <input type="number" step="0.01" name="bb" value="<?= $user['bb'] ?>" required>
-
-            <button type="submit" name="update" class="btn save">Simpan Perubahan</button>
-        </form>
-    <?php } ?>
-
-    <p style="text-align:center; margin-top:10px;">
-        <a href="user.php">← Kembali ke Dashboard</a>
-    </p>
+        <div class="mt-3">
+          <button type="submit" class="btn btn-success btn-sm">
+            <i class="bi bi-check-circle me-1"></i> Simpan Profil
+          </button>
+          <a href="user.php" class="btn btn-outline-secondary btn-sm ms-2">
+            Batal
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
