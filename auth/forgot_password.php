@@ -9,7 +9,7 @@ require __DIR__ . '/../app/core/bootstrap.php';
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light d-flex align-items-center" style="min-height:100vh;">
+<body class="bg-light d-flex align-items-center" style="min-height:100vh; background:linear-gradient(135deg, #1b4332, #2d6a4f)">
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-md-5">

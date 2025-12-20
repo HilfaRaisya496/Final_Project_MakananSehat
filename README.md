@@ -88,7 +88,7 @@ Panduan singkat untuk menjalankan proyek ini secara lokal.
 
 5. Jalankan aplikasi (pilih salah satu):
 
-  - Dengan XAMPP/Apache: set `DocumentRoot` ke folder `public/` (contoh: `C:/xampp/htdocs/tes2/public`) lalu akses `http://localhost/tes2/` atau rute yang sesuai.
+  - Dengan XAMPP/Apache: set `DocumentRoot` ke folder `public/` (contoh: `C:/xampp/htdocs/final_project_makanansehat/public`) lalu akses `http://localhost/final_project_makanansehat/` atau rute yang sesuai.
   - Menggunakan built-in PHP server (pengembangan):
 
     ```bash

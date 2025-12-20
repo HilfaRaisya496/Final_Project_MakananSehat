@@ -54,7 +54,7 @@ $emailValue = $_POST['email'] ?? ($_COOKIE['remember_email'] ?? '');
   <style>
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #38b000, #468903ff);
+      background: linear-gradient(135deg, #1b4332, #2d6a4f);
       display: flex;
       align-items: center;
       justify-content: center;
