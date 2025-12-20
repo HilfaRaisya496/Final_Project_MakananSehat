@@ -1,15 +1,15 @@
 <?php
 require_once __DIR__ . '/../app/core/bootstrap.php';
 
-$uri  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$base = '/tes2/public';
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$base = ($_ENV['APP_PATH'] ?? '') . '/public';
 
 $path = str_replace($base, '', $uri);
 $path = rtrim($path, '/') ?: '/';
 
 switch ($path) {
     case '/':
-        header('Location: /tes2/auth/login.php');
+        header('Location: ' . base_url('/auth/login.php'));
         exit;
 
     case '/dashboard/user':
