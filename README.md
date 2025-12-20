@@ -41,7 +41,7 @@ Aplikasi web untuk membantu mahasiswa merencanakan menu sehat, mencatat makanan 
   - `/admin` – halaman admin: `users.php`, `notifications.php`, dll.
 - `cron_send_menu_reminder.php` – script cron pengingat menu harian.
 - `.env` – konfigurasi (DB, Edamam API, SMTP).
-- - `index.php` – tampilan awal(promosi).
+- `index.php` – tampilan awal(promosi).
 
 ## Cara Menjalankan di Lokal
 
