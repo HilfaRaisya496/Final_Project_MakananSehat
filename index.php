@@ -189,12 +189,10 @@
             Temukan rekomendasi menu seimbang, penuh sayur dan buah, yang membantu menjaga energi dan kesehatan setiap hari.
         </p>
 
-        <!-- Tombol ke halaman login -->
         <a href="public/index.php" class="btn-main">Start Now</a>
     </div>
 
     <div class="hero-logo">
-        <!-- gunakan file logo yang kamu kirim -->
         <img src="public/img/logo.jpg" alt="Logo Trihealth">
     </div>
 </section>
