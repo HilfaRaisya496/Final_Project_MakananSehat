@@ -1,13 +1,13 @@
-<?php 
+<?php
 require_once __DIR__ . '/../../app/core/helpers.php';
-auth_required(); 
+auth_required();
 ?>
 <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(90deg,#1b4332,#2d6a4f);">
   <div class="container-fluid">
     <!-- Brand -->
     <a class="navbar-brand d-flex align-items-center" href="user.php">
       <span class="me-2 rounded-3 bg-light bg-opacity-10 d-inline-flex align-items-center justify-content-center"
-            style="width:34px;height:34px;">
+        style="width:34px;height:34px;">
         <i class="bi bi-egg-fried"></i>
       </span>
       <div class="d-flex flex-column lh-1">
@@ -17,7 +17,8 @@ auth_required();
     </a>
 
     <!-- Toggler -->
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarUser" aria-controls="navbarUser" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarUser"
+      aria-controls="navbarUser" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -56,7 +57,7 @@ auth_required();
           <i class="bi bi-person-check me-1"></i>
           Logged in as <strong><?= htmlspecialchars($_SESSION['role']) ?></strong>
         </span>
-        <a href="/tes2/auth/logout.php" class="btn btn-sm btn-outline-light">
+        <a href="<?= base_url('/auth/logout.php') ?>" class="btn btn-sm btn-outline-light">
           <i class="bi bi-box-arrow-right me-1"></i> Logout
         </a>
       </div>
