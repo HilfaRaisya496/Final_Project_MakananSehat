@@ -36,31 +36,34 @@ class RecommendationService
         $dietFinal      = $diet    !== null && $diet    !== '' ? $diet    : $profile['diet'];
         $exclFinal      = $exclude !== null && $exclude !== '' ? $exclude : $profile['intolerances'];
 
-        // siapkan parameter Edamam Recipe Search v2
+       
+        $mealsPerDay = 3;
+        $calPerMeal  = (int) round($targetCalories / $mealsPerDay);
+
+        
+        $margin = 150;
+        $lower  = max(100, $calPerMeal - $margin);
+        $upper  = $calPerMeal + $margin;
+
         $params = [
-            'type'             => 'public',
-            'q'                => 'healthy',      // kata kunci umum
-            'random'           => 'true',
-            'imageSize'        => 'REGULAR',
-            'calories'         => '100-800',      // per porsi
-            'field'            => ['uri','label','calories','yield','totalNutrients','totalTime','image'],
-            'limit'            => 10,
+            'type'       => 'public',
+            'q'          => 'healthy',
+            'random'     => 'true',
+            'imageSize'  => 'REGULAR',
+            'calories'   => "{$lower}-{$upper}", 
+            'field'      => ['uri','label','calories','yield','totalNutrients','totalTime','image'],
+            'limit'      => 10,
         ];
 
         if ($dietFinal) {
-            // Edamam pakai 'diet' dan/atau 'health' label
-            $params['diet'] = $dietFinal;
+            $params['diet'] = $dietFinal; 
         }
         if ($exclFinal) {
-            // intolerances -> "excluded" ingredient (simple)
-            $params['excluded'] = $exclFinal;
+            $params['excluded'] = $exclFinal; 
         }
 
-        // panggil Edamam (pastikan method searchRecipes & header user sudah disesuaikan)
         $response = $this->client->searchRecipes($params['q'], $params, 'user-'.$userId);
 
-
-        // kalau Edamam balas error (mis. auth / quota)
         if (!is_array($response) || isset($response['error'])) {
             return [
                 'status'  => 'failure',
@@ -76,33 +79,31 @@ class RecommendationService
             ];
         }
 
-        // pilih hingga 3 recipe pertama sebagai "meal plan" (sarapan, lunch, dinner)
-        $selected = array_slice($hits, 0, 3);
+        // 3 meal: sarapan, lunch, dinner
+        $selected = array_slice($hits, 0, $mealsPerDay);
 
-        $meals = [];
-        $totalCal = 0;
+        $meals        = [];
+        $totalCal     = 0;
         $totalProtein = 0;
-        $totalCarbs = 0;
-        $totalFat = 0;
+        $totalCarbs   = 0;
+        $totalFat     = 0;
 
         foreach ($selected as $hit) {
             $recipe = $hit['recipe'];
 
-            // kalori per porsi
-            $servings = max(1, (int)($recipe['yield'] ?? 1));
+            $servings      = max(1, (int)($recipe['yield'] ?? 1));
             $calPerServing = ($recipe['calories'] ?? 0) / $servings;
 
             $nut = $recipe['totalNutrients'] ?? [];
 
-            // totalNutrients[PROCNT|CHOCDF|FAT] adalah total 1 resep → dibagi servings untuk per porsi.
-            $protein = $this->getNutrientQuantity($nut, 'PROCNT'); // Protein
-            $carbs   = $this->getNutrientQuantity($nut, 'CHOCDF'); // Carbs
-            $fat     = $this->getNutrientQuantity($nut, 'FAT');    // Fat
+            $protein = $this->getNutrientQuantity($nut, 'PROCNT'); 
+            $carbs   = $this->getNutrientQuantity($nut, 'CHOCDF');
+            $fat     = $this->getNutrientQuantity($nut, 'FAT');
 
             $totalCal     += $calPerServing;
             $totalProtein += $protein / $servings;
-            $totalCarbs   += $carbs / $servings;
-            $totalFat     += $fat / $servings;
+            $totalCarbs   += $carbs   / $servings;
+            $totalFat     += $fat     / $servings;
 
             $meals[] = [
                 'uri'            => $recipe['uri'],
@@ -114,76 +115,76 @@ class RecommendationService
             ];
         }
 
-        $plan = [
-            'meals' => $meals,
+        $calDiff = $totalCal - $targetCalories;
+
+        return [
+            'status'    => 'success',
+            'meals'     => $meals,
             'nutrients' => [
-                'calories'      => round($totalCal),
-                'protein'       => round($totalProtein),
-                'carbohydrates' => round($totalCarbs),
-                'fat'           => round($totalFat),
+                'targetCalories' => $targetCalories,
+                'calories'       => round($totalCal),
+                'calDiff'        => round($calDiff),  
+                'protein'        => round($totalProtein),
+                'carbohydrates'  => round($totalCarbs),
+                'fat'            => round($totalFat),
             ],
         ];
-
-        // opsional: simpan raw plan
-        // $this->foodRec->saveMealPlanRaw($userId, $plan);
-
-        return $plan;
     }
 
     public function searchRecipesRaw(int $userId, string $query): array
-{
-    $query = trim($query);
-    if ($query === '') {
+    {
+        $query = trim($query);
+        if ($query === '') {
+            return [
+                'status'  => 'empty',
+                'message' => 'Kata kunci pencarian kosong.',
+                'results' => [],
+            ];
+        }
+
+        $params = [
+            'type'       => 'public',
+            'q'          => $query,
+            'imageSize'  => 'REGULAR',
+            'calories'   => '50-1200',
+            'field'      => ['uri','label','calories','yield','totalNutrients','totalTime','image'],
+            'limit'      => 20,
+        ];
+
+        $response = $this->client->searchRecipes($params['q'], $params, 'user-'.$userId);
+
+        if (!is_array($response) || isset($response['error'])) {
+            return [
+                'status'  => 'failure',
+                'message' => $response['error'] ?? 'Gagal memanggil Edamam untuk pencarian.',
+                'results' => [],
+            ];
+        }
+
+        $hits = $response['hits'] ?? [];
+        $results = [];
+
+        foreach ($hits as $hit) {
+            $recipe = $hit['recipe'] ?? null;
+            if (!$recipe) continue;
+
+            $servings = max(1, (int)($recipe['yield'] ?? 1));
+            $calPerServing = ($recipe['calories'] ?? 0) / $servings;
+
+            $results[] = [
+                'uri'            => $recipe['uri'],
+                'title'          => $recipe['label'],
+                'image'          => $recipe['image'] ?? null,
+                'readyInMinutes' => (int)($recipe['totalTime'] ?? 0),
+                'servings'       => $servings,
+                'calories'       => round($calPerServing),
+            ];
+        }
+
         return [
-            'status'  => 'empty',
-            'message' => 'Kata kunci pencarian kosong.',
-            'results' => [],
-        ];
-    }
-
-    $params = [
-        'type'       => 'public',
-        'q'          => $query,
-        'imageSize'  => 'REGULAR',
-        'calories'   => '50-1200',
-        'field'      => ['uri','label','calories','yield','totalNutrients','totalTime','image'],
-        'limit'      => 20,
-    ];
-
-    $response = $this->client->searchRecipes($params['q'], $params, 'user-'.$userId);
-
-    if (!is_array($response) || isset($response['error'])) {
-        return [
-            'status'  => 'failure',
-            'message' => $response['error'] ?? 'Gagal memanggil Edamam untuk pencarian.',
-            'results' => [],
-        ];
-    }
-
-    $hits = $response['hits'] ?? [];
-    $results = [];
-
-    foreach ($hits as $hit) {
-        $recipe = $hit['recipe'] ?? null;
-        if (!$recipe) continue;
-
-        $servings = max(1, (int)($recipe['yield'] ?? 1));
-        $calPerServing = ($recipe['calories'] ?? 0) / $servings;
-
-        $results[] = [
-            'uri'            => $recipe['uri'],
-            'title'          => $recipe['label'],
-            'image'          => $recipe['image'] ?? null,
-            'readyInMinutes' => (int)($recipe['totalTime'] ?? 0),
-            'servings'       => $servings,
-            'calories'       => round($calPerServing),
-        ];
-    }
-
-    return [
-            'status'  => 'success',
-            'message' => 'OK',
-            'results' => $results,
+                'status'  => 'success',
+                'message' => 'OK',
+                'results' => $results,
         ];
     }
 
@@ -220,7 +221,6 @@ class RecommendationService
 
     private function getNutrientQuantity(array $totalNutrients, string $code): float
     {
-        // Edamam pakai kode nutrisi: ENERC_KCAL, FAT, CHOCDF, PROCNT, dll.
         if (isset($totalNutrients[$code]['quantity'])) {
             return (float)$totalNutrients[$code]['quantity'];
         }
