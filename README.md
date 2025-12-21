@@ -40,7 +40,8 @@ Aplikasi web untuk membantu mahasiswa merencanakan menu sehat, mencatat makanan 
   - `/user` – halaman user: `user.php`, `rekomendasi.php`, `cari_makanan.php`, `food_logs_index.php`, `edit_profile.php`, `dashboard_gizi.php`, dll.
   - `/admin` – halaman admin: `users.php`, `notifications.php`, dll.
 - `cron_send_menu_reminder.php` – script cron pengingat menu harian.
-- `.env` – konfigurasi (DB, Edamam API, SMTP).
+- `.env.example` – konfigurasi (DB, Edamam API, SMTP).
+- `index.php` – tampilan awal(promosi).
 
 ## Cara Menjalankan di Lokal
 
@@ -50,7 +51,7 @@ Panduan singkat untuk menjalankan proyek ini secara lokal.
 
   ```bash
   git clone <repo-url>
-  cd tes2
+  cd Final_ProjectMakananSehat
   ```
 
 2. Instal dependensi PHP via Composer:
@@ -86,16 +87,9 @@ Panduan singkat untuk menjalankan proyek ini secara lokal.
   mysql -u DB_USER -p DB_NAME < path/to/schema.sql
   ```
 
-5. Jalankan aplikasi (pilih salah satu):
+5. Jalankan aplikasi :
 
-  - Dengan XAMPP/Apache: set `DocumentRoot` ke folder `public/` (contoh: `C:/xampp/htdocs/final_project_makanansehat/public`) lalu akses `http://localhost/final_project_makanansehat/` atau rute yang sesuai.
-  - Menggunakan built-in PHP server (pengembangan):
-
-    ```bash
-    php -S localhost:8000 -t public
-    ```
-
-  Setelah server berjalan, buka `http://localhost:8000/` atau URL sesuai konfigurasi.
+  - Dengan XAMPP/Apache: set `DocumentRoot` ke folder `index.php` (contoh: `C:/xampp/htdocs/final_project_makanansehat`) lalu akses `http://localhost/final_project_makanansehat/` atau rute yang sesuai.
 
 6. (Opsional) Jika Anda ingin menjalankan cron pengingat harian secara manual:
 
