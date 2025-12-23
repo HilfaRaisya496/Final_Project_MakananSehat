@@ -1,4 +1,7 @@
 <?php
+
+date_default_timezone_set('Asia/Jakarta');
+
 // cron_send_menu_reminder.php
 require __DIR__ . '/app/core/bootstrap.php';
 require_once __DIR__ . '/app/api/EdamamClient.php';

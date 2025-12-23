@@ -36,11 +36,17 @@ Aplikasi web untuk membantu mahasiswa merencanakan menu sehat, mencatat makanan 
   - `/models` – `User.php`, `UserProfile.php`, `FoodRecommendation.php`, `Notification.php`, dll.
   - `/services` – `RecommendationService.php`, `AnalyticsService.php`, `NotificationService.php`.
   - `/api` – `EdamamClient.php`.
+  - `/controllers` – `RecommendationController.php`.
 - `/dashboard`
   - `/user` – halaman user: `user.php`, `rekomendasi.php`, `cari_makanan.php`, `food_logs_index.php`, `edit_profile.php`, `dashboard_gizi.php`, dll.
   - `/admin` – halaman admin: `users.php`, `notifications.php`, dll.
+- `/config`
+  - `Database.php`, konfigurasi DB.
+  - `env.php`, untuk membaca file konfigurasi API key dan email bisa digunakan tanpa ditulis langsung di kode.
+- `/auth`
+  - `login.php`, `logout.php`, `forgot_password.php`, `register.php`, `register_success.php`.
 - `cron_send_menu_reminder.php` – script cron pengingat menu harian.
-- `.env.example` – konfigurasi (DB, Edamam API, SMTP).
+- `.env.example` – konfigurasi (Edamam API, SMTP, APP_PATH).
 - `index.php` – tampilan awal(promosi).
 
 ## Cara Menjalankan di Lokal
@@ -63,11 +69,6 @@ Panduan singkat untuk menjalankan proyek ini secara lokal.
 3. Buat file `.env` di root proyek jika belum ada. Contoh variabel yang harus diisi:
 
   ```env
-  DB_HOST=127.0.0.1
-  DB_NAME=your_database
-  DB_USER=your_user
-  DB_PASS=your_password
-
   EDAMAM_APP_ID=your_edamam_app_id
   EDAMAM_APP_KEY=your_edamam_app_key
 
@@ -77,6 +78,8 @@ Panduan singkat untuk menjalankan proyek ini secara lokal.
   SMTP_PASS=smtp_pass
   SMTP_FROM_EMAIL=from@example.com
   SMTP_FROM_NAME="TriHealth"
+
+  APP_PATH="/isi sesuai alamat folder" (NO CAPSLOK)
   ```
 
   Catatan: proyek menggunakan `vlucas/phpdotenv` melalui `config/env.php` untuk memuat file `.env` dari folder root.
