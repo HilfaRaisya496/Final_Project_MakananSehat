@@ -1,6 +1,4 @@
 <?php
-// app/controllers/FoodRecommendationController.php
-
 require_once __DIR__ . '/../core/bootstrap.php';
 require_once __DIR__ . '/../api/EdamamClient.php';
 require_once __DIR__ . '/../services/RecommendationService.php';

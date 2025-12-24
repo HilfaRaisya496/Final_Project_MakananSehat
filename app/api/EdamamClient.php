@@ -1,6 +1,4 @@
 <?php
-// app/api/EdamamClient.php
-
 class EdamamClient
 {
     private string $appId;
@@ -41,7 +39,6 @@ class EdamamClient
             return is_array($cached) ? $cached : [];
         }
 
-        // tambahkan header Edamam-Account-User di sini
         $headers = [
             'Edamam-Account-User: user-' . ($params['user_id'] ?? 'demo'),
         ];

@@ -1,6 +1,4 @@
 <?php
-// app/models/FoodRecommendation.php
-
 class FoodRecommendation
 {
     private PDO $db;

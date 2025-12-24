@@ -1,6 +1,4 @@
 <?php
-// app/services/AnalyticsService.php
-
 class AnalyticsService
 {
     private PDO $db;
